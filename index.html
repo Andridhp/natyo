@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NATYO POS - Heladería</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #fdf6f0;
+      min-height: 100vh;
+      padding-bottom: 70px;
+    }
+    /* Login */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #fdf6f0 0%, #fce4ec 100%);
+      padding: 20px;
+    }
+    .login-card {
+      background: white;
+      padding: 40px 32px;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 420px;
+    }
+    .login-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-logo span {
+      font-size: 48px;
+      display: block;
+    }
+    .login-logo h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #e07a5f;
+      margin: 4px 0 0 0;
+    }
+    .login-logo p {
+      font-size: 14px;
+      color: #8d99ae;
+      margin: 4px 0 0 0;
+      letter-spacing: 2px;
+    }
+    .input-field {
+      width: 100%;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      border: 2px solid #e8e8e4;
+      border-radius: 12px;
+      font-size: 16px;
+      background: #fafafa;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #e07a5f 0%, #d66a4a 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .credentials-box {
+      margin-top: 20px;
+      padding: 16px;
+      background: #f8f4f2;
+      border-radius: 12px;
+      border: 1px solid #f0e6e0;
+    }
+    .credentials-box p {
+      font-size: 13px;
+      color: #4a4a4a;
+      margin: 2px 0;
+    }
+    .credentials-box .title {
+      font-weight: 600;
+      color: #6b4c3b;
+      margin-bottom: 6px;
+    }
+    /* POS */
+    .pos-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: #fdf6f0;
+    }
+    .pos-header {
+      background: white;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #f0e6e0;
+    }
+    .pos-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pos-header .logo span {
+      font-size: 28px;
+    }
+    .pos-header .logo h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #e07a5f;
+      margin: 0;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #374151;
+    }
+    .user-info .badge {
+      background: #fce4ec;
+      color: #d66a4a;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .pos-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      gap: 16px;
+      padding: 16px;
+    }
+    .product-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .search-box input {
+      flex: 1;
+      padding: 12px 16px 12px 44px;
+      border: 2px solid #e8e8e4;
+      border-radius: 12px;
+      font-size: 15px;
+      background: #fafafa;
+      outline: none;
+    }
+    .search-box .camera-btn {
+      padding: 10px 14px;
+      background: #f8f4f2;
+      border: 2px solid #e8e8e4;
+      border-radius: 12px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .categories {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      flex-shrink: 0;
+    }
+    .categories button {
+      padding: 8px 18px;
+      border-radius: 24px;
+      border: 2px solid #e8e8e4;
+      background: white;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .categories button.active {
+      border-color: #e07a5f;
+      box-shadow: 0 2px 8px rgba(224, 122, 95, 0.15);
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      flex: 1;
+      overflow-y: auto;
+      align-content: start;
+      padding: 4px 0;
+    }
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px 10px;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-height: 120px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      background: #f9f2ee;
+    }
+    .product-card .emoji {
+      font-size: 36px;
+      margin-bottom: 4px;
+    }
+    .product-card .name {
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      color: #1f2937;
+    }
+    .product-card .desc {
+      font-size: 11px;
+      text-align: center;
+      color: #8d99ae;
+    }
+    .product-card .price {
+      font-size: 16px;
+      font-weight: 700;
+      color: #e07a5f;
+      margin-top: 4px;
+    }
+    /* Carrito */
+    .cart-area {
+      width: 360px;
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .cart-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0;
+    }
+    .cart-header .count {
+      font-size: 13px;
+      color: #8d99ae;
+      background: #f8f4f2;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+    .cart-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #8d99ae;
+    }
+    .cart-empty span {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    .cart-items {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 12px;
+    }
+    .cart-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #f0e6e0;
+    }
+    .cart-item .info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cart-item .info .name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1f2937;
+    }
+    .cart-item .info .price {
+      font-size: 14px;
+      font-weight: 600;
+      color: #e07a5f;
+    }
+    .cart-item .actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .cart-item .actions button {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid #e8e8e4;
+      background: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .cart-item .actions .qty {
+      font-size: 15px;
+      font-weight: 600;
+      min-width: 24px;
+      text-align: center;
+    }
+    .cart-item .actions .remove {
+      background: none;
+      border: none;
+      color: #d66a4a;
+      font-size: 16px;
+    }
+    .cart-totals {
+      border-top: 2px solid #f0e6e0;
+      padding-top: 12px;
+    }
+    .cart-totals .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 15px;
+      color: #1f2937;
+    }
+    .cart-totals .row .total-label {
+      font-weight: 700;
+      font-size: 17px;
+    }
+    .cart-totals .row .total-value {
+      font-weight: 700;
+      font-size: 19px;
+      color: #e07a5f;
+    }
+    .checkout-btn {
+      padding: 16px;
+      background: linear-gradient(135deg, #e07a5f 0%, #d66a4a 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    .payment-section select, .payment-section input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 2px solid #e8e8e4;
+      font-size: 15px;
+      margin-bottom: 10px;
+      background: white;
+    }
+    .checkout-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .checkout-actions .cancel {
+      flex: 1;
+      padding: 14px;
+      background: #f8f4f2;
+      color: #4a4a4a;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .checkout-actions .confirm {
+      flex: 2;
+      padding: 14px;
+      background: linear-gradient(135deg, #e07a5f 0%, #d66a4a 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    /* Navegación inferior */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 2px solid #f0e6e0;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+      z-index: 100;
+    }
+    .bottom-nav button {
+      background: none;
+      border: none;
+      padding: 6px 16px;
+      font-size: 14px;
+      color: #8d99ae;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .bottom-nav button.active {
+      color: #e07a5f;
+      font-weight: 600;
+    }
+    /* Dashboard */
+    .dashboard {
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .dashboard h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+    .dashboard .sub {
+      font-size: 16px;
+      color: #8d99ae;
+      margin-bottom: 20px;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .dashboard-card {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      position: relative;
+    }
+    .dashboard-card .icon {
+      font-size: 24px;
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      opacity: 0.5;
+    }
+    .dashboard-card .label {
+      font-size: 14px;
+      color: #8d99ae;
+    }
+    .dashboard-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+    .dashboard-card .change {
+      font-size: 13px;
+      color: #4a9e6e;
+    }
+    .ranking-list {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .ranking-list h4 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 12px;
+    }
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      background: #faf8f6;
+      border-radius: 10px;
+      margin-bottom: 6px;
+    }
+    .ranking-item .num {
+      font-weight: 700;
+      color: #e07a5f;
+      width: 24px;
+    }
+    .ranking-item .name {
+      flex: 1;
+      font-weight: 500;
+      color: #1f2937;
+    }
+    .ranking-item .val {
+      color: #8d99ae;
+    }
+    .placeholder {
+      padding: 80px 20px;
+      text-align: center;
+    }
+    .placeholder span {
+      font-size: 64px;
+      display: block;
+      margin-bottom: 16px;
+    }
+    .placeholder h2 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    .placeholder p {
+      font-size: 16px;
+      color: #8d99ae;
+    }
+    @media (max-width: 768px) {
+      .pos-body {
+        flex-direction: column;
+      }
+      .cart-area {
+        width: 100%;
+        max-height: 300px;
+      }
+      .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    // ============================================
+    // DATOS DE PRUEBA
+    // ============================================
+    const productData = [
+      { id: 1, name: 'Yogurt Mediano', price: 45, category: 'Yogurt', emoji: '🍦', desc: 'Delicioso yogurt cremoso' },
+      { id: 2, name: 'Yogurt Grande', price: 60, category: 'Yogurt', emoji: '🍦', desc: 'Yogurt tamaño familiar' },
+      { id: 3, name: 'Vaso Chico', price: 10, category: 'Vasos', emoji: '🥤', desc: 'Vaso desechable pequeño' },
+      { id: 4, name: 'Vaso Mediano', price: 15, category: 'Vasos', emoji: '🥤', desc: 'Vaso desechable mediano' },
+      { id: 5, name: 'Vaso Grande', price: 20, category: 'Vasos', emoji: '🥤', desc: 'Vaso desechable grande' },
+      { id: 6, name: 'Topping Fresa', price: 8, category: 'Toppings', emoji: '🍓', desc: 'Fresas naturales' },
+      { id: 7, name: 'Topping Chocolate', price: 8, category: 'Toppings', emoji: '🍫', desc: 'Chocolate amargo' },
+      { id: 8, name: 'Topping Oreo', price: 10, category: 'Toppings', emoji: '🍪', desc: 'Galleta Oreo triturada' },
+      { id: 9, name: 'Agua', price: 15, category: 'Bebidas', emoji: '💧', desc: 'Agua purificada' },
+      { id: 10, name: 'Refresco', price: 25, category: 'Bebidas', emoji: '🥤', desc: 'Refresco de cola' },
+      { id: 11, name: 'Combo Yogurt + Vaso', price: 55, category: 'Combos', emoji: '🧃', desc: 'Ahorra con este combo' },
+      { id: 12, name: 'Cono Sencillo', price: 35, category: 'Conos', emoji: '🍦', desc: 'Cono clásico de yogurt' },
+      { id: 13, name: 'Cono Especial', price: 50, category: 'Conos', emoji: '🍦', desc: 'Cono con toppings' },
+    ]
+
+    const categoryData = [
+      'Yogurt', 'Vasos', 'Toppings', 'Bebidas', 'Combos', 'Conos', 'Promociones'
+    ]
+
+    // ============================================
+    // APLICACIÓN REACT (en vanilla JS)
+    // ============================================
+    let currentUser = null
+    let currentView = 'pos'
+    let cart = []
+    let selectedCategory = 'Todos'
+    let paymentMethod = 'efectivo'
+    let cashReceived = ''
+    let showCheckout = false
+    let searchTerm = ''
+
+    const root = document.getElementById('root')
+
+    // ============================================
+    // RENDER
+    // ============================================
+    function render() {
+      if (!currentUser) {
+        root.innerHTML = renderLogin()
+        attachLoginEvents()
+        return
+      }
+
+      const isOwner = currentUser.role === 'owner'
+      let content = ''
+
+      if (currentView === 'pos') {
+        content = renderPOS(isOwner)
+      } else if (currentView === 'dashboard') {
+        content = renderDashboard()
+      } else {
+        content = `
+          <div class="placeholder">
+            <span>📦</span>
+            <h2>${currentView === 'inventory' ? 'Inventario' : currentView === 'reports' ? 'Reportes' : 'Configuración'}</h2>
+            <p>Próximamente: más funciones</p>
+          </div>
+        `
+      }
+
+      const nav = renderBottomNav(isOwner)
+
+      root.innerHTML = content + nav
+      attachEvents()
+    }
+
+    // ============================================
+    // LOGIN
+    // ============================================
+    function renderLogin() {
+      return `
+        <div class="login-container">
+          <div class="login-card">
+            <div class="login-logo">
+              <span>🍦</span>
+              <h1>NATYO</h1>
+              <p>Punto de Venta</p>
+            </div>
+            <form id="loginForm">
+              <input class="input-field" id="loginEmail" type="email" placeholder="Correo electrónico" value="owner@natyopos.com" />
+              <input class="input-field" id="loginPassword" type="password" placeholder="Contraseña" value="owner123" />
+              <button class="btn-primary" type="submit">Ingresar</button>
+            </form>
+            <div class="credentials-box">
+              <p class="title">🔑 Acceso rápido</p>
+              <p><strong>Dueño:</strong> owner@natyopos.com</p>
+              <p><strong>Colaborador:</strong> colaborador@natyopos.com</p>
+              <p style="font-size:11px;color:#94a3b8;">Contraseña: owner123 / colaborador123</p>
+            </div>
+          </div>
+        </div>
+      `
+    }
+
+    function attachLoginEvents() {
+      const form = document.getElementById('loginForm')
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault()
+          const email = document.getElementById('loginEmail').value
+          const password = document.getElementById('loginPassword').value
+          if (email && password) {
+            let role = 'colaborador'
+            let name = 'Colaborador'
+            if (email === 'owner@natyopos.com') {
+              role = 'owner'
+              name = 'Dueño'
+            }
+            currentUser = { id: 1, name, email, role, branchId: 1, branchName: 'Centro' }
+            cart = []
+            render()
+          }
+        })
+      }
+    }
+
+    // ============================================
+    // POS
+    // ============================================
+    function renderPOS(isOwner) {
+      const filtered = productData.filter(p => {
+        const matchCat = selectedCategory === 'Todos' || p.category === selectedCategory
+        const matchSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            p.desc.toLowerCase().includes(searchTerm.toLowerCase())
+        return matchCat && matchSearch
+      })
+
+      const cartHTML = cart.length === 0 ? `
+        <div class="cart-empty">
+          <span>🛒</span>
+          <p>Agrega productos</p>
+          <p style="font-size:13px;color:#b0b8c4;">Toca un producto para agregarlo</p>
+        </div>
+      ` : `
+        <div class="cart-items">
+          ${cart.map(item => `
+            <div class="cart-item">
+              <div class="info">
+                <span class="name">${item.name}</span>
+                <span class="price">$${(item.price * item.quantity).toFixed(2)}</span>
+              </div>
+              <div class="actions">
+                <button data-action="qty" data-id="${item.id}" data-delta="-1">−</button>
+                <span class="qty">${item.quantity}</span>
+                <button data-action="qty" data-id="${item.id}" data-delta="1">+</button>
+                <button class="remove" data-action="remove" data-id="${item.id}">✕</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="cart-totals">
+          <div class="row"><span>Subtotal</span><span>$${cart.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(2)}</span></div>
+          <div class="row"><span class="total-label">Total</span><span class="total-value">$${cart.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(2)}</span></div>
+        </div>
+        ${showCheckout ? `
+          <div class="payment-section">
+            <select id="paymentMethod">
+              <option value="efectivo">💵 Efectivo</option>
+              <option value="tarjeta">💳 Tarjeta</option>
+              <option value="transferencia">🏦 Transferencia</option>
+            </select>
+            <input id="cashReceived" type="number" placeholder="Monto entregado" />
+          </div>
+          <div class="checkout-actions">
+            <button class="cancel" data-action="cancelCheckout">Cancelar</button>
+            <button class="confirm" data-action="confirmCheckout">✅ Confirmar</button>
+          </div>
+        ` : `
+          <button class="checkout-btn" data-action="checkout">🛒 Cobrar</button>
+        `}
+      `
+
+      const categoriesHTML = `
+        <button class="${selectedCategory === 'Todos' ? 'active' : ''}" data-category="Todos">🌟 Todos</button>
+        ${categoryData.map(cat => `
+          <button class="${selectedCategory === cat ? 'active' : ''}" data-category="${cat}">${cat}</button>
+        `).join('')}
+      `
+
+      const productsHTML = filtered.length === 0 ? `
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:#8d99ae;">No hay productos</div>
+      ` : filtered.map(p => `
+        <button class="product-card" data-product="${p.id}">
+          <span class="emoji">${p.emoji}</span>
+          <span class="name">${p.name}</span>
+          <span class="desc">${p.desc}</span>
+          <span class="price">$${p.price.toFixed(2)}</span>
+        </button>
+      `).join('')
+
+      return `
+        <div class="pos-container">
+          <div class="pos-header">
+            <div class="logo">
+              <span>🍦</span>
+              <h2>NATYO POS</h2>
+            </div>
+            <div class="user-info">
+              <span>👤 ${currentUser.name}</span>
+              <span class="badge">${currentUser.branchName}</span>
+            </div>
+          </div>
+          <div class="pos-body">
+            <div class="product-area">
+              <div class="search-box">
+                <input id="searchInput" type="text" placeholder="Buscar producto..." value="${searchTerm}" />
+                <button class="camera-btn" data-action="camera">📷</button>
+              </div>
+              <div class="categories">${categoriesHTML}</div>
+              <div class="product-grid">${productsHTML}</div>
+            </div>
+            <div class="cart-area">
+              <div class="cart-header">
+                <h3>🛒 Carrito</h3>
+                <span class="count">${cart.length} productos</span>
+              </div>
+              ${cartHTML}
+            </div>
+          </div>
+        </div>
+      `
+    }
+
+    // ============================================
+    // DASHBOARD
+    // ============================================
+    function renderDashboard() {
+      return `
+        <div class="dashboard">
+          <h2>📊 Panel de Control</h2>
+          <p class="sub">Bienvenido, ${currentUser.name}</p>
+          <div class="dashboard-grid">
+            <div class="dashboard-card">
+              <span class="icon">📈</span>
+              <p class="label">Ventas Hoy</p>
+              <p class="value">$12,450</p>
+              <p class="change">↑ 12% vs ayer</p>
+            </div>
+            <div class="dashboard-card">
+              <span class="icon">📊</span>
+              <p class="label">Ventas Mes</p>
+              <p class="value">$85,320</p>
+              <p class="change">↑ 8% vs mes anterior</p>
+            </div>
+            <div class="dashboard-card">
+              <span class="icon">🎫</span>
+              <p class="label">Tickets Hoy</p>
+              <p class="value">47</p>
+              <p class="change">Promedio: $265</p>
+            </div>
+            <div class="dashboard-card">
+              <span class="icon">🏆</span>
+              <p class="label">Ticket Promedio</p>
+              <p class="value">$265</p>
+              <p class="change">Meta: $300</p>
+            </div>
+          </div>
+          <div class="ranking-list">
+            <h4>🏷️ Productos Más Vendidos</h4>
+            <div class="ranking-item"><span class="num">1</span><span class="name">Yogurt Mediano</span><span class="val">45 unidades</span></div>
+            <div class="ranking-item"><span class="num">2</span><span class="name">Vaso Grande</span><span class="val">32 unidades</span></div>
+            <div class="ranking-item"><span class="num">3</span><span class="name">Topping Fresa</span><span class="val">28 unidades</span></div>
+            <div class="ranking-item"><span class="num">4</span><span class="name">Combo Yogurt + Vaso</span><span class="val">20 unidades</span></div>
+          </div>
+        </div>
+      `
+    }
+
+    // ============================================
+    // NAVEGACIÓN INFERIOR
+    // ============================================
+    function renderBottomNav(isOwner) {
+      const navItems = []
+      if (isOwner) {
+        navItems.push({ id: 'dashboard', label: '📊 Inicio' })
+      }
+      navItems.push({ id: 'pos', label: '🛒 Ventas' })
+      if (isOwner) {
+        navItems.push({ id: 'inventory', label: '📦 Inventario' })
+        navItems.push({ id: 'reports', label: '📄 Reportes' })
+        navItems.push({ id: 'settings', label: '⚙️ Más' })
+      }
+
+      return `
+        <div class="bottom-nav">
+          ${navItems.map(item => `
+            <button data-view="${item.id}" class="${currentView === item.id ? 'active' : ''}">${item.label}</button>
+          `).join('')}
+        </div>
+      `
+    }
+
+    // ============================================
+    // EVENTOS
+    // ============================================
+    function attachEvents() {
+      const isOwner = currentUser?.role === 'owner'
+
+      // Navegación inferior
+      document.querySelectorAll('.bottom-nav button[data-view]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentView = btn.dataset.view
+          render()
+        })
+      })
+
+      // Categorías
+      document.querySelectorAll('.categories button[data-category]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedCategory = btn.dataset.category
+          render()
+        })
+      })
+
+      // Búsqueda
+      const searchInput = document.getElementById('searchInput')
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          searchTerm = e.target.value
+          render()
+        })
+      }
+
+      // Productos
+      document.querySelectorAll('.product-card[data-product]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.dataset.product)
+          const product = productData.find(p => p.id === id)
+          if (product) {
+            const existing = cart.find(i => i.id === id)
+            if (existing) {
+              existing.quantity += 1
+            } else {
+              cart.push({ ...product, quantity: 1 })
+            }
+            if (navigator.vibrate) navigator.vibrate(10)
+            render()
+          }
+        })
+      })
+
+      // Carrito: cantidad
+      document.querySelectorAll('[data-action="qty"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.dataset.id)
+          const delta = parseInt(btn.dataset.delta)
+          const item = cart.find(i => i.id === id)
+          if (item) {
+            item.quantity += delta
+            if (item.quantity <= 0) {
+              cart = cart.filter(i => i.id !== id)
+            }
+            render()
+          }
+        })
+      })
+
+      // Carrito: eliminar
+      document.querySelectorAll('[data-action="remove"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.dataset.id)
+          cart = cart.filter(i => i.id !== id)
+          render()
+        })
+      })
+
+      // Cobrar
+      const checkoutBtn = document.querySelector('[data-action="checkout"]')
+      if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+          if (cart.length === 0) {
+            alert('El carrito está vacío')
+            return
+          }
+          showCheckout = true
+          render()
+        })
+      }
+
+      // Cancelar checkout
+      const cancelBtn = document.querySelector('[data-action="cancelCheckout"]')
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+          showCheckout = false
+          render()
+        })
+      }
+
+      // Confirmar checkout
+      const confirmBtn = document.querySelector('[data-action="confirmCheckout"]')
+      if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => {
+          const total = cart.reduce((s, i) => s + i.price * i.quantity, 0)
+          const method = document.getElementById('paymentMethod')?.value || 'efectivo'
+          let change = 0
+          if (method === 'efectivo') {
+            const received = parseFloat(document.getElementById('cashReceived')?.value)
+            if (isNaN(received) || received < total) {
+              alert('El monto entregado debe ser mayor o igual al total')
+              return
+            }
+            change = received - total
+          }
+          alert(`✅ ¡Venta registrada!\n\nTotal: $${total.toFixed(2)}\nMétodo: ${method}\n${method === 'efectivo' ? `Cambio: $${change.toFixed(2)}` : ''}\n\n¡Gracias por tu compra! 🍦`)
+          cart = []
+          showCheckout = false
+          cashReceived = ''
+          render()
+        })
+      }
+
+      // Cámara
+      document.querySelector('[data-action="camera"]')?.addEventListener('click', () => {
+        alert('📸 Función de cámara preparada. Próximamente podrás asociar fotos a productos.')
+      })
+    }
+
+    // ============================================
+    // INICIO
+    // ============================================
+    render()
+  </script>
+</body>
+</html>
