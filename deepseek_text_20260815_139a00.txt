@@ -1,0 +1,3 @@
+mi-repositorio/
+├── index.html
+└── favicon.ico   ← (tu logo, pero con este nombre)
